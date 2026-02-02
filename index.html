@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>SAIFANO ProducTree | Ultra Elite Focus</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --dark: #1B5E20;
+            --bg: #F2F5F2;
+            --surface: #FFFFFF;
+            --text: #263238;
+            --danger: #E53935;
+            --accent: #FFCA28;
+            --tier-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 0;
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            background: var(--surface);
+            height: 65px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            z-index: 100; flex-shrink: 0;
+        }
+        .brand-name { font-weight: 700; color: var(--dark); font-size: 1.1rem; }
+        .currency { 
+            background: #FFF8E1; color: #F57F17; 
+            padding: 5px 15px; border-radius: 20px; 
+            font-weight: 700; font-size: 0.85rem;
+        }
+
+        /* CONTENT ENGINE */
+        #viewport { flex: 1; overflow-y: auto; padding: 20px; position: relative; }
+        .screen { display: none; max-width: 480px; margin: 0 auto; animation: fadeInUp 0.4s ease forwards; }
+        .screen.active { display: block; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CIRCLE VISUALIZER */
+        .stage-area {
+            width: 250px; height: 250px; margin: 10px auto 30px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        .timer-svg { position: absolute; transform: rotate(-90deg); width: 100%; height: 100%; }
+        .circle-base { fill: none; stroke: #eee; stroke-width: 8; }
+        .circle-fill { 
+            fill: none; stroke: var(--primary); stroke-width: 8; 
+            stroke-linecap: round; stroke-dasharray: 660; 
+            stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear;
+        }
+
+        #visual-box {
+            width: 140px; height: 140px;
+            display: flex; align-items: center; justify-content: center;
+            animation: gentleSway 5s infinite ease-in-out;
+            z-index: 10;
+        }
+        @keyframes gentleSway { 0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(2deg)} }
+
+        .time-digits { text-align: center; font-size: 3.8rem; font-weight: 700; color: var(--text); margin: 0; line-height: 1; }
+        .motivation-box { text-align: center; font-style: italic; color: #90A4AE; min-height: 45px; margin: 15px 0 25px; font-size: 0.9rem; padding: 0 10px;}
+
+        /* CARDS & SELECTOR */
+        .main-card { background: var(--surface); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 15px;}
+        .selection-trigger {
+            background: #F1F8E9; border: 1.5px dashed var(--primary);
+            padding: 15px; border-radius: 12px; font-weight: 700; 
+            margin-bottom: 20px; cursor: pointer; display: flex; 
+            justify-content: space-between; align-items: center; font-size: 0.9rem;
+        }
+
+        input[type=range] { width: 100%; height: 8px; border-radius: 10px; background: #eee; -webkit-appearance: none; accent-color: var(--primary); margin: 25px 0; cursor: pointer;}
+        
+        .btn { width: 100%; border: none; padding: 18px; border-radius: 15px; font-size: 1.1rem; font-weight: 700; color: #fff; cursor: pointer; transition: 0.2s; font-family: 'Quicksand'; }
+        .btn:active { transform: scale(0.97); }
+        .btn-p { background: var(--primary); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.25); }
+        .btn-d { background: var(--danger); box-shadow: 0 5px 15px rgba(229, 57, 53, 0.25); }
+
+        /* FOREST & LISTS */
+        .stat-banner { background: var(--surface); display: flex; justify-content: space-around; padding: 15px; border-radius: 18px; margin-bottom: 20px; text-align: center; font-weight: 700; }
+        .stat-banner span { display: block; font-size: 0.65rem; color: #aaa; text-transform: uppercase;}
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 12px; }
+        .hist-box { background: var(--surface); border-radius: 12px; padding: 12px; text-align: center; font-size: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-weight: bold; }
+
+        .shop-card {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--surface); padding: 15px; border-radius: 18px; margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 2px solid transparent;
+        }
+        .shop-icon-box { width: 50px; height: 50px; display:flex; align-items:center; justify-content:center; }
+        
+        .tier-tag { font-size: 0.6rem; color: #fff; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
+        .p-elite { background: #9C27B0; } .p-epic { background: #3F51B5; } .p-universal { background: #000; color: gold; border: 1px solid gold; }
+
+        /* FOOTER BRANDING */
+        .credits { text-align: center; color: #B0BEC5; font-size: 0.7rem; font-weight: 800; padding: 30px 0; width: 100%; text-transform: uppercase; }
+
+        /* BOTTOM NAVBAR */
+        nav { 
+            background: var(--surface); height: 75px; border-top: 1px solid #f1f1f1;
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0;
+        }
+        .tab { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; color: #CFD8DC; font-size: 0.75rem; font-weight: 700; font-family: inherit; }
+        .tab.active { color: var(--primary); }
+        .tab span { font-size: 1.5rem; margin-bottom: 4px; }
+
+        /* MODALS */
+        .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .backdrop.on { display: flex; animation: fadeIn 0.3s; }
+        .pop { background: var(--surface); width: 85%; max-width: 320px; padding: 35px; border-radius: 30px; text-align: center; }
+
+        .hidden { display: none !important; }
+        body.focused header, body.focused nav, body.focused .credits { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header id="h">
+        <div class="brand-name">SAIFANO ProducTree</div>
+        <div class="currency">🪙 <span id="coin-disp">0</span></div>
+    </header>
+
+    <div id="viewport">
+        <!-- VIEW: DASHBOARD -->
+        <div id="v-home" class="screen active">
+            <div class="stage-area">
+                <svg class="timer-svg" viewBox="0 0 220 220">
+                    <circle class="circle-base" cx="110" cy="110" r="105"/>
+                    <circle class="circle-fill" id="ring-fill" cx="110" cy="110" r="105"/>
+                </svg>
+                <div id="visual-box"></div>
+            </div>
+
+            <h1 class="time-digits" id="time-txt">25:00</h1>
+            <div class="motivation-box" id="quote-area">Grow something special.</div>
+
+            <div id="ui-setup">
+                <div class="selection-trigger" onclick="Core.nav('shop')">
+                    <span>Species: <b id="ui-active-tree-name">Oak</b></span>
+                    <span>CHANGE 🔄</span>
+                </div>
+                <div class="main-card">
+                    <div style="display:flex; justify-content:space-between; font-weight:700">
+                        <span>Timer</span> <span id="lbl-val" style="color:var(--primary)">25 min</span>
+                    </div>
+                    <input type="range" id="slid-inp" min="1" max="120" value="25">
+                    <button class="btn btn-p" onclick="Core.start()">PLANT NOW</button>
+                </div>
+            </div>
+
+            <div id="ui-focused" class="hidden" style="text-align: center;">
+                <button class="btn btn-d" style="width: auto; padding: 15px 50px" onclick="Core.askStop()">GIVE UP</button>
+            </div>
+            
+            <div class="credits">Developed by SAIFUR RAHAMAN SAIF</div>
+        </div>
+
+        <!-- VIEW: FOREST -->
+        <div id="v-forest" class="screen">
+            <div class="stat-banner">
+                <div><span id="st-c">0</span><span>Total</span></div>
+                <div><span id="st-h">0.0</span><span>Hours</span></div>
+                <div><span id="st-l">1</span><span>Lv.</span></div>
+            </div>
+            <div class="grid" id="ui-hist-grid"></div>
+            <div class="credits">Developed by SAIFUR RAHAMAN SAIF</div>
+        </div>
+
+        <!-- VIEW: SHOP -->
+        <div id="v-shop" class="screen">
+            <h2 style="margin:0 0 15px 0">Prestige Nursery</h2>
+            <div id="ui-shop-list"></div>
+            <div class="credits">Developed by SAIFUR RAHAMAN SAIF</div>
+        </div>
+    </div>
+
+    <nav id="navbar">
+        <button class="tab active" onclick="Core.nav('home', this)"><span>⏱️</span>Timer</button>
+        <button class="tab" onclick="Core.nav('forest', this)"><span>🌲</span>Forest</button>
+        <button class="tab" onclick="Core.nav('shop', this)"><span>🛍️</span>Shop</button>
+    </nav>
+
+    <!-- MODAL OVERLAY -->
+    <div class="backdrop" id="modal-layer">
+        <div id="win-pop" class="pop hidden">
+            <h2 style="color:var(--primary); margin-top:0">Well Done!</h2>
+            <div id="win-svg" style="height:90px; margin: 15px 0"></div>
+            <p style="font-weight:700">Earnings: +<span id="win-coins-val">0</span> Coins</p>
+            <button class="btn btn-p" onclick="Core.modOff()">Awesome</button>
+        </div>
+        <div id="fail-pop" class="pop hidden">
+            <h2 style="color:var(--danger); margin-top:0">Surrender?</h2>
+            <p>Abandoning this session will result in a withered tree.</p>
+            <button class="btn btn-d" onclick="Core.end(false)">Give Up</button>
+            <button style="border:none;background:none;color:#999;font-weight:700;margin-top:20px;font-family:inherit" onclick="Core.modOff()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+    /* 1. ASSET CONFIG (ViewBox 0-100 x 0-100) */
+    const GFX = {
+        stages: {
+            seed: `<circle cx="50" cy="55" r="10" fill="#795548"/>`,
+            sprout: `<path d="M50,70 Q50,45 35,35 M50,70 Q50,45 65,35" stroke="#81C784" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+            sapling: `<path d="M50,70 L50,40 M50,55 L35,40 M50,60 L65,40" stroke="#66BB6A" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+            dead: `<path d="M30,30 L70,70 M70,30 L30,70" stroke="#B0BEC5" stroke-width="6"/>`
+        },
+        trees: {
+            oak:   { id:'oak', name:'Common Oak', cost:0, t:'p-lite', svg:`<circle cx="50" cy="38" r="30" fill="#43A047"/><rect x="42" y="65" width="16" height="25" fill="#5D4037"/>` },
+            pine:  { id:'pine', name:'Highland Pine', cost:100, t:'p-lite', svg:`<path d="M50,15 L15,80 L85,80 Z" fill="#2E7D32"/><rect x="44" y="80" width="12" height="15" fill="#3E2723"/>` },
+            sakura:{ id:'sakura', name:'Sakura Bloom', cost:1000, t:'p-epic', svg:`<g fill="#F48FB1"><circle cx="35" cy="40" r="18"/><circle cx="65" cy="40" r="18"/><circle cx="50" cy="25" r="20"/></g><rect x="46" y="60" width="8" height="35" fill="#5D4037"/>` },
+            // NEW ELITE VALUE TREES
+            maple: { id:'maple', name:'Fiery Maple', cost:5000, t:'p-elite', svg:`<circle cx="50" cy="35" r="30" fill="#D32F2F" stroke="#FF5252" stroke-width="2"/><rect x="45" y="60" width="10" height="30" fill="#212121"/>` },
+            azure: { id:'azure', name:'Azure Eucalyptus', cost:10000, t:'p-elite', svg:`<circle cx="30" cy="40" r="15" fill="#0288D1"/><circle cx="70" cy="40" r="15" fill="#0288D1"/><circle cx="50" cy="25" r="22" fill="#00BCD4"/><rect x="45" y="60" width="10" height="30" fill="#37474F"/>` },
+            birch: { id:'birch', name:'Silver Birch', cost:20000, t:'p-elite', svg:`<path d="M50,15 L20,80 L80,80 Z" fill="#E1F5FE" stroke="#81D4FA" stroke-width="2"/><circle cx="50" cy="45" r="6" fill="#FFF"/>` },
+            spirit:{ id:'spirit', name:'Mythic Spirit', cost:30000, t:'p-elite', svg:`<g opacity="0.8"><circle cx="40" cy="40" r="15" fill="#EA80FC"/><circle cx="60" cy="40" r="15" fill="#B388FF"/><circle cx="50" cy="25" r="20" fill="#AA00FF"/></g><rect x="46" y="60" width="8" height="30" fill="#212121"/>` },
+            galaxy:{ id:'galaxy', name:'Galaxy Cedar', cost:40000, t:'p-epic', svg:`<circle cx="50" cy="35" r="35" fill="#1A237E" stroke="#311B92" stroke-width="4"/><circle cx="45" cy="30" r="1.5" fill="#fff"/><circle cx="60" cy="45" r="1.2" fill="#fff"/><rect x="46" y="70" width="8" height="20" fill="#212121"/>` },
+            sun:   { id:'sun', name:'The Eternal Sun', cost:50000, t:'p-universal', svg:`<circle cx="50" cy="38" r="40" fill="#FFD700" stroke="#FF6F00" stroke-width="4"/><path d="M50,10 L58,22 L42,22 Z" fill="#fff"/><rect x="42" y="75" width="16" height="20" fill="#3E2723"/>` }
+        }
+    };
+
+    /* 2. ENGINE LOGIC */
+    const Core = {
+        save: { coins: 0, unlocked: ['oak'], equipped: 'oak', history: [], xp: 0 },
+        tm: { id: null, left: 1500, full: 1500, running: false },
+
+        init() {
+            let local = localStorage.getItem('SAIF_V3_MASTER');
+            if(local) this.save = JSON.parse(local);
+
+            this.updateHeaderUI();
+            this.drawInRing(GFX.stages.seed);
+            
+            const slider = document.getElementById('slid-inp');
+            slider.addEventListener('input', (e) => {
+                if (this.tm.running) return;
+                const v = parseInt(e.target.value);
+                this.tm.full = v * 60;
+                this.tm.left = this.tm.full;
+                document.getElementById('lbl-val').innerText = v + " min";
+                document.getElementById('time-txt').innerText = v + ":00";
+            });
+            // Initial check
+            this.tm.full = parseInt(slider.value) * 60;
+            this.tm.left = this.tm.full;
+
+            this.quote();
+            window.Core = this;
+        },
+
+        nav(scr, btn) {
+            if (this.tm.running) return;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('v-' + scr).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            if(scr==='forest') this.rendHist();
+            if(scr==='shop') this.rendShop();
+        },
+
+        start() {
+            this.tm.left = this.tm.full; // Reset precisely
+            this.tm.running = true;
+
+            document.body.classList.add('focused');
+            document.getElementById('ui-setup').classList.add('hidden');
+            document.getElementById('ui-focused').classList.remove('hidden');
+
+            this.drawInRing(GFX.stages.seed);
+            this.ringProgress(0);
+
+            this.tm.id = setInterval(() => {
+                this.tm.left--;
+                this.tick();
+                if(this.tm.left <= 0) this.end(true);
+            }, 1000);
+        },
+
+        tick() {
+            const m = Math.floor(this.tm.left / 60);
+            const s = this.tm.left % 60;
+            document.getElementById('time-txt').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+            
+            const p = 1 - (this.tm.left / this.tm.full);
+            this.ringProgress(p);
+
+            if(p < 0.25) this.drawInRing(GFX.stages.seed);
+            else if(p < 0.5) this.drawInRing(GFX.stages.sprout);
+            else if(p < 0.8) this.drawInRing(GFX.stages.sapling);
+            else this.drawFinalTree();
+        },
+
+        askStop() { 
+            document.getElementById('modal-layer').classList.add('on');
+            document.getElementById('fail-pop').classList.remove('hidden');
+        },
+
+        end(success) {
+            clearInterval(this.tm.id);
+            this.tm.running = false;
+            document.body.classList.remove('focused');
+            document.getElementById('ui-setup').classList.remove('hidden');
+            document.getElementById('ui-focused').classList.add('hidden');
+            this.modOff();
+
+            let minDone = Math.floor(this.tm.full / 60);
+            this.ringProgress(0);
+            document.getElementById('time-txt').innerText = minDone + ":00";
+
+            if (success) {
+                this.save.coins += minDone;
+                this.save.xp += (minDone * 10);
+                this.save.history.unshift({ tree: this.save.equipped, min: minDone, date: new Date().toLocaleDateString(), fail: false });
+                
+                document.getElementById('win-coins-val').innerText = minDone;
+                document.getElementById('win-svg').innerHTML = `<svg viewBox="0 0 100 100" style="height:100%">${GFX.trees[this.save.equipped].svg}</svg>`;
+                document.getElementById('modal-layer').classList.add('on');
+                document.getElementById('win-pop').classList.remove('hidden');
+
+                try { const actx = new AudioContext(); let osc = actx.createOscillator(); osc.connect(actx.destination); osc.start(); osc.stop(actx.currentTime+0.2); } catch(e){}
+            } else {
+                this.save.history.unshift({ tree: this.save.equipped, min: 0, date: new Date().toLocaleDateString(), fail: true });
+                this.drawInRing(GFX.stages.dead);
+            }
+            this.persist();
+        },
+
+        rendHist() {
+            let d = document.getElementById('ui-hist-grid'); d.innerHTML = '';
+            let tmTotal = 0;
+            this.save.history.forEach(h => {
+                if(!h.fail) tmTotal += h.min;
+                let el = document.createElement('div'); el.className='hist-box';
+                let svg = h.fail ? GFX.stages.dead : GFX.trees[h.tree].svg;
+                el.innerHTML = `<svg viewBox='0 0 100 100' height='40' style='opacity:${h.fail?0.4:1}'>${svg}</svg><br/>${h.min}m`;
+                d.appendChild(el);
+            });
+            document.getElementById('st-c').innerText = this.save.history.filter(h=>!h.fail).length;
+            document.getElementById('st-h').innerText = (tmTotal/60).toFixed(1);
+            document.getElementById('st-l').innerText = Math.floor(this.save.xp/500)+1;
+        },
+
+        rendShop() {
+            let d = document.getElementById('ui-shop-list'); d.innerHTML = '';
+            Object.values(GFX.trees).forEach(t => {
+                let own = this.save.unlocked.includes(t.id);
+                let el = document.createElement('div'); el.className='shop-card';
+                let btn = '';
+                if(own) {
+                    btn = (this.save.equipped===t.id) ? `<small style="font-weight:700; color:var(--primary)">Active</small>` : `<button onclick="Core.equip('${t.id}')" style="background:#eee;border:none;padding:5px 12px;border-radius:10px">Use</button>`;
+                } else {
+                    btn = `<button onclick="Core.buy('${t.id}')" ${this.save.coins<t.cost?'disabled':''} class='price-tag'>${t.cost.toLocaleString()}</button>`;
+                }
+                el.innerHTML = `<div style="display:flex;align-items:center;gap:12px">
+                   <div class="shop-icon-box"><svg viewBox="0 0 100 100" style="width:100%">${t.svg}</svg></div>
+                   <div><b>${t.name}</b><br/><span class='tier-tag ${t.t}'>Prestige</span></div>
+                </div><div>${btn}</div>`;
+                d.appendChild(el);
+            });
+        },
+
+        updateHeaderUI() { 
+            document.getElementById('coin-disp').innerText = this.save.coins.toLocaleString(); 
+            document.getElementById('ui-active-tree-name').innerText = GFX.trees[this.save.equipped].name;
+        },
+        drawInRing(svg) { document.getElementById('visual-box').innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%">${svg}</svg>`; },
+        drawFinalTree() { this.drawInRing(GFX.trees[this.save.equipped].svg); },
+        ringProgress(pct) { document.getElementById('ring-fill').style.strokeDashoffset = 628 - (628 * pct); },
+        persist() { localStorage.setItem('SAIF_V3_MASTER', JSON.stringify(this.save)); this.updateHeaderUI(); },
+        modOff() { 
+            document.getElementById('modal-layer').classList.remove('on'); 
+            document.getElementById('win-pop').classList.add('hidden');
+            document.getElementById('fail-pop').classList.add('hidden');
+            if(!this.tm.running) this.drawInRing(GFX.stages.seed); 
+        },
+        quote() { const qs = ["Patience yields focus.", "Quietly productive.", "One seed, many roots.", "Plant your future today."]; document.getElementById('quote-area').innerText = '"' + qs[Math.floor(Math.random()*qs.length)] + '"'; },
+        equip(id) { this.save.equipped = id; this.persist(); this.rendShop(); },
+        buy(id) { if(this.save.coins >= GFX.trees[id].cost){ this.save.coins -= GFX.trees[id].cost; this.save.unlocked.push(id); this.save.equipped = id; this.persist(); this.rendShop(); } }
+    };
+    window.onload = function(){ Core.init(); };
+    </script>
+</body>
+</html>
