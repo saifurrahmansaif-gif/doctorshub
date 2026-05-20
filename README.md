@@ -5,7 +5,7 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![JSON](https://img.shields.io/badge/json-5E5C5C?style=for-the-badge&logo=json&logoColor=white)
 
-**Live Demo:** [Click here to find a doctor](https://saifurrahmansaif-gif.github.io/doctors-hub/)
+**Live Demo:** [Click here to find a doctor](https://saifurrahmansaif-gif.github.io/doctorshub/)
 
 ## The Motivation: A Personal Journey
 This project was born not from a technical challenge, but from a personal crisis. When my grandmother suffered a minor stroke, I witnessed firsthand the frantic, stressful search my family endured to find a suitable specialist. My father went from hospital to hospital, struggling to gather information and find the right doctor in a time of urgent need.
